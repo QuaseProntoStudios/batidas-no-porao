@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Batidas no Porao: prototipo original de clicker de terror com combate."
+    />
+    <title>Batidas no Porão</title>
+    <link
+      rel="preload"
+      href="assets/fonts/PressStart2P-Regular.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="preload" href="assets/basement-door.png" as="image" />
+    <link rel="stylesheet" href="styles.css?v=0.5.1" />
+  </head>
+  <body>
+    <div class="crt-noise" aria-hidden="true"></div>
+    <div class="crt-lines" aria-hidden="true"></div>
+
+    <section class="main-menu is-open" id="mainMenu" aria-live="polite" aria-hidden="false">
+      <div class="menu-panel menu-screen is-active" id="menuHome">
+        <p class="eyebrow" data-i18n="prototype">Protótipo 0.2</p>
+        <h1 data-i18n="gameTitle">Batidas no Porão</h1>
+        <p class="menu-tagline" data-i18n="menuTagline">
+          Uma porta aprende seu nome batida por batida.
+        </p>
+        <nav class="menu-actions" aria-label="Menu principal">
+          <button class="menu-button" id="newGameButton" type="button" data-i18n="newGame">Novo jogo</button>
+          <button class="menu-button" id="continueButton" type="button" data-i18n="continueGame">Continuar</button>
+          <button class="menu-button" id="menuOptionsButton" type="button" data-i18n="options">Opções</button>
+          <button class="menu-button danger-button" id="quitButton" type="button" data-i18n="quitGame">Sair</button>
+        </nav>
+      </div>
+
+      <div class="menu-panel menu-screen" id="menuDifficulty">
+        <p class="eyebrow" data-i18n="newGame">Novo jogo</p>
+        <h2 data-i18n="chooseDifficulty">Escolha a dificuldade</h2>
+        <div class="difficulty-grid">
+          <button class="difficulty-card" type="button" data-difficulty="easy">
+            <strong data-i18n="difficultyEasy">Vela acesa</strong>
+            <span data-i18n="difficultyEasyDesc">Mais vida, pressão menor e recompensas mais suaves.</span>
+          </button>
+          <button class="difficulty-card is-selected" type="button" data-difficulty="normal">
+            <strong data-i18n="difficultyNormal">Porão frio</strong>
+            <span data-i18n="difficultyNormalDesc">A experiência original do protótipo.</span>
+          </button>
+          <button class="difficulty-card" type="button" data-difficulty="hard">
+            <strong data-i18n="difficultyHard">Casa faminta</strong>
+            <span data-i18n="difficultyHardDesc">Inimigos batem mais forte e a sanidade escapa rápido.</span>
+          </button>
+        </div>
+        <div class="menu-actions horizontal">
+          <button class="menu-button" id="startLoreButton" type="button" data-i18n="createSave">Criar save</button>
+          <button class="menu-button" id="difficultyBackButton" type="button" data-i18n="back">Voltar</button>
+        </div>
+      </div>
+
+      <div class="menu-panel menu-screen lore-screen" id="menuLore">
+        <p class="eyebrow" data-i18n="loreKicker">Registro encontrado</p>
+        <h2 data-i18n="loreTitle">A casa sob o batente</h2>
+        <div class="lore-copy">
+          <p data-i18n="loreP1">
+            Seu avô nunca construiu um porão. Ainda assim, toda noite a casa respirava por baixo do assoalho.
+          </p>
+          <p data-i18n="loreP2">
+            Quando ele morreu, deixou uma chave sem dentes, um gravador mudo e uma regra escrita no verso de uma conta de luz: se a porta responder, não pare de bater.
+          </p>
+          <p data-i18n="loreP3">
+            A madeira não guarda tesouros. Ela guarda salas que não cabem na planta da casa, criaturas feitas de poeira velha e fragmentos de medo capazes de comprar mais uma madrugada.
+          </p>
+          <p data-i18n="loreP4">
+            Hoje a primeira porta apareceu no corredor. Ela já sabe o som da sua mão. Agora quer aprender o resto.
+          </p>
+        </div>
+        <button class="menu-button" id="beginGameButton" type="button" data-i18n="beginGame">Começar</button>
+      </div>
+
+      <div class="menu-panel menu-screen" id="menuOptions">
+        <p class="eyebrow" data-i18n="options">Opções</p>
+        <h2 data-i18n="settings">Configurações</h2>
+        <div class="menu-options-grid">
+          <div class="desk-row">
+            <label for="menuLanguageSelect" data-i18n="language">Idioma</label>
+            <select id="menuLanguageSelect" aria-label="Idioma">
+              <option value="pt">PT</option>
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+            </select>
+          </div>
+          <div class="desk-row volume-row">
+            <label for="menuMusicVolume" data-i18n="musicVolume">Música</label>
+            <input id="menuMusicVolume" type="range" min="0" max="100" step="1" value="65" />
+            <strong id="menuMusicVolumeValue">65%</strong>
+          </div>
+          <div class="desk-row volume-row">
+            <label for="menuSfxVolume" data-i18n="sfxVolume">Efeitos</label>
+            <input id="menuSfxVolume" type="range" min="0" max="100" step="1" value="70" />
+            <strong id="menuSfxVolumeValue">70%</strong>
+          </div>
+          <div class="desk-row">
+            <span data-i18n="autoSave">Salvamento automático</span>
+            <button class="small-button" id="menuAutoSaveToggle" type="button">Ligado</button>
+          </div>
+          <section class="manual-save-panel">
+            <h3 data-i18n="manualSaves">Saves manuais</h3>
+            <div class="manual-save-list" id="menuManualSaves"></div>
+          </section>
+        </div>
+        <button class="menu-button" id="menuOptionsBackButton" type="button" data-i18n="back">Voltar</button>
+      </div>
+      <div class="menu-build">
+        <span>by Teuzin0Dev</span>
+        <strong id="menuVersion">v0.5.1</strong>
+      </div>
+    </section>
+
+    <main class="game-shell" id="game">
+      <aside class="left-console" aria-label="Registro de combate">
+        <header class="console-header">
+          <p class="pixel-title" data-i18n="combatMode">-- Em tensão --</p>
+          <strong id="roomLabel">Sala 0</strong>
+        </header>
+
+        <section class="resource-row">
+          <article>
+            <span>☗</span>
+            <strong id="fearValue">0</strong>
+          </article>
+          <article>
+            <span>◈</span>
+            <strong id="shardValue">0</strong>
+          </article>
+        </section>
+
+        <section class="left-mid">
+          <ol class="combat-log" id="combatLog"></ol>
+          <aside class="room-rail" aria-label="Progresso das salas">
+            <ol class="room-progress" id="roomProgress"></ol>
+          </aside>
+        </section>
+
+        <section class="left-actions">
+          <button class="console-button" id="nextRoomButton" type="button">
+            <span class="button-icon">▣</span>
+            <span data-i18n="nextRoom">Entrar na próxima sala</span>
+          </button>
+          <button class="console-button" id="autoToggle" type="button">
+            <span class="button-icon">↻</span>
+            <span data-i18n="autoOff">Auto ataque desligado</span>
+          </button>
+          <button class="console-button" id="autoAdvanceToggle" type="button">
+            <span class="button-icon">⇥</span>
+            <span data-i18n="autoAdvanceOff">Auto sala desligada</span>
+          </button>
+          <button class="panic-button" id="surrenderButton" type="button">
+            <span class="button-icon">☠</span>
+            <span data-i18n="retreat">Recuar</span>
+          </button>
+        </section>
+      </aside>
+
+      <section class="center-stage">
+        <header class="top-hud">
+          <div>
+            <p class="eyebrow" data-i18n="prototype">Protótipo 0.2</p>
+            <h1 data-i18n="gameTitle">Batidas no Porão</h1>
+          </div>
+          <div class="hud-controls">
+            <label class="select-label" for="languageSelect" data-i18n="language">Idioma</label>
+            <select id="languageSelect" aria-label="Idioma">
+              <option value="pt">PT</option>
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+            </select>
+          </div>
+        </header>
+
+        <section class="stats-strip" aria-label="Estado atual">
+          <article>
+            <span data-i18n="fear">Medo</span>
+            <strong id="fearStat">0</strong>
+          </article>
+          <article>
+            <span data-i18n="hitPower">Dano</span>
+            <strong id="hitValue">1</strong>
+          </article>
+          <article>
+            <span data-i18n="autoDamage">Auto</span>
+            <strong id="autoValue">0/s</strong>
+          </article>
+          <article>
+            <span data-i18n="sanity">Sanidade</span>
+            <strong id="sanityValue">100%</strong>
+          </article>
+        </section>
+
+        <section class="meta-strip" aria-label="Metaprogressão">
+          <article>
+            <span data-i18n="combo">Combo</span>
+            <strong id="comboValue">x1.0</strong>
+          </article>
+          <article>
+            <span data-i18n="echoes">Ecos</span>
+            <strong id="echoValue">0</strong>
+          </article>
+          <article>
+            <span data-i18n="bestRoom">Melhor sala</span>
+            <strong id="bestRoomValue">0</strong>
+          </article>
+        </section>
+
+        <section class="arena-wrap" aria-label="Arena">
+          <canvas id="arenaCanvas" width="480" height="270" aria-hidden="true"></canvas>
+          <img
+            class="door-texture"
+            id="doorTexture"
+            src="assets/basement-door.png"
+            alt="Porta antiga de porão com uma presença sombria atrás da madeira rachada."
+          />
+          <div class="arena-vignette" aria-hidden="true"></div>
+          <div class="enemy-sprite" id="enemySprite" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scenery-sprite scenery-candles" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-chain" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-bones" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-sigil" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-lamp" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-pipe" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-eyes" aria-hidden="true"></div>
+          <div class="scenery-sprite scenery-handprints" aria-hidden="true"></div>
+          <div class="attack-sprite" id="attackSprite" aria-hidden="true"></div>
+          <div class="slash-layer" id="slashLayer" aria-hidden="true"></div>
+          <div class="pet-sprite" id="petSprite" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="floating-layer" id="floatLayer" aria-hidden="true"></div>
+          <div class="combat-mods" id="combatMods" aria-hidden="true"></div>
+
+          <div class="target-card target-card-top">
+            <p id="targetKicker">Porta selada</p>
+            <h2 id="targetName">A primeira porta</h2>
+            <div class="bar">
+              <span id="targetHpBar"></span>
+            </div>
+            <strong id="targetHpText">30/30</strong>
+          </div>
+
+          <button class="main-action" id="mainAction" type="button">
+            <span id="mainActionIcon">▥</span>
+            <span id="mainActionText">Bater</span>
+          </button>
+        </section>
+
+        <footer class="bottom-caption" id="chapterNote">
+          A primeira porta ainda está aprendendo o som da sua mão.
+        </footer>
+      </section>
+
+      <aside class="right-console" aria-label="Painel de progressão">
+        <section class="portrait-panel">
+          <div class="portrait" id="portrait">
+            <span></span>
+          </div>
+          <button class="pause-button" id="pauseToggle" type="button" aria-label="Pausar">Ⅱ</button>
+        </section>
+
+        <section class="enemy-panel">
+          <div class="bar blue">
+            <span id="playerHpBar"></span>
+          </div>
+          <div class="stat-line">
+            <span>HP</span>
+            <strong id="playerHpText">100/100</strong>
+          </div>
+          <div class="stat-line">
+            <span data-i18n="pressure">Pressão</span>
+            <strong id="pressureText">0%</strong>
+          </div>
+        </section>
+
+        <section class="inventory-strip">
+          <button class="inventory-button" id="inventoryToggle" type="button">
+            <span>▦</span>
+            <strong data-i18n="inventory">Inventário</strong>
+          </button>
+          <p id="nextDropText">Próximo drop em 2 inimigos</p>
+        </section>
+
+        <section class="tabs">
+          <button class="tab is-active" type="button" data-tab="upgrades" data-i18n="rituals">
+            Rituais
+          </button>
+          <button class="tab" type="button" data-tab="goals" data-i18n="goals">
+            Metas
+          </button>
+          <button class="tab" type="button" data-tab="story" data-i18n="records">
+            Registro
+          </button>
+          <button class="tab" type="button" data-tab="options" data-i18n="desk">
+            Mesa
+          </button>
+        </section>
+
+        <section class="panel-view is-active" id="upgradesPanel">
+          <div class="upgrade-list" id="upgradeList"></div>
+        </section>
+
+        <section class="panel-view" id="goalsPanel">
+          <section class="goals-block">
+            <header>
+              <h3 data-i18n="contracts">Contratos</h3>
+              <span data-i18n="contractsHint">Recompensas curtas para manter o ritmo.</span>
+            </header>
+            <div class="goal-list" id="contractList"></div>
+          </section>
+          <section class="goals-block">
+            <header>
+              <h3 data-i18n="prestige">Ecos</h3>
+              <span id="prestigeRewardText">Chegue na sala 50.</span>
+            </header>
+            <button class="prestige-button" id="prestigeButton" type="button" data-i18n="prestigeButton">
+              Ecoar porão
+            </button>
+          </section>
+          <section class="goals-block">
+            <header>
+              <h3 data-i18n="achievements">Conquistas</h3>
+              <span data-i18n="achievementsHint">Marcos permanentes com recompensas.</span>
+            </header>
+            <div class="goal-list" id="achievementList"></div>
+          </section>
+        </section>
+
+        <section class="panel-view" id="storyPanel">
+          <ol class="story-log" id="storyLog"></ol>
+        </section>
+
+        <section class="panel-view" id="optionsPanel">
+          <div class="desk-row">
+            <span data-i18n="sound">Som</span>
+            <strong id="soundLabel">Ligado</strong>
+          </div>
+          <div class="desk-row">
+            <span data-i18n="assetPack">Pacote de assets</span>
+            <strong id="assetPackLabel">Interno</strong>
+          </div>
+          <div class="desk-row">
+            <span data-i18n="save">Salvamento</span>
+            <strong id="saveLabel">Automático</strong>
+          </div>
+          <button class="danger-button" id="resetButton" type="button" data-i18n="resetSave">
+            Apagar save
+          </button>
+        </section>
+      </aside>
+    </main>
+
+    <section class="event-modal" id="eventModal" aria-live="polite" aria-hidden="true">
+      <div class="event-panel">
+        <p class="eyebrow" id="eventKicker">Registro</p>
+        <h2 id="eventTitle">Algo respondeu</h2>
+        <p id="eventText">Duas batidas vieram do outro lado.</p>
+        <button class="small-button" id="eventClose" type="button" data-i18n="continue">
+          Continuar
+        </button>
+      </div>
+    </section>
+
+    <section class="inventory-modal" id="inventoryModal" aria-live="polite" aria-hidden="true">
+      <div class="inventory-panel">
+        <header class="inventory-head">
+          <div>
+            <p class="eyebrow" data-i18n="inventory">Inventário</p>
+            <h2 id="inventoryTitle">Itens do porão</h2>
+          </div>
+          <button class="small-button" id="inventoryClose" type="button" data-i18n="close">
+            Fechar
+          </button>
+        </header>
+        <div class="inventory-grid" id="inventoryGrid"></div>
+        <p class="inventory-help" id="inventoryHelp">
+          Itens caem ao derrotar quantidades específicas de inimigos.
+        </p>
+      </div>
+    </section>
+
+    <section class="merchant-modal" id="merchantModal" aria-live="polite" aria-hidden="true">
+      <div class="merchant-panel">
+        <header class="inventory-head">
+          <div>
+            <p class="eyebrow" data-i18n="merchantKickerShort">Mercador</p>
+            <h2 data-i18n="merchantTitle">Mesa do mercador</h2>
+          </div>
+          <button class="small-button" id="merchantClose" type="button" data-i18n="close">
+            Fechar
+          </button>
+        </header>
+        <p class="merchant-help" id="merchantHelp">Você tem 0 moedas.</p>
+        <div class="merchant-stock" id="merchantStock"></div>
+      </div>
+    </section>
+
+    <section class="pause-modal" id="pauseModal" aria-live="polite" aria-hidden="true">
+      <div class="pause-panel">
+        <header class="pause-head">
+          <div>
+            <p class="eyebrow" data-i18n="pause">Pausa</p>
+            <h2 data-i18n="pauseTitle">Menu do jogo</h2>
+          </div>
+          <button class="small-button" id="pauseClose" type="button" data-i18n="resume">
+            Continuar
+          </button>
+        </header>
+
+        <div class="pause-grid">
+          <section class="pause-section">
+            <h3 data-i18n="settings">Configurações</h3>
+            <div class="desk-row">
+              <span data-i18n="sound">Som</span>
+              <button class="small-button" id="soundToggle" type="button">Ligado</button>
+            </div>
+            <div class="desk-row volume-row">
+              <label for="musicVolume" data-i18n="musicVolume">Música</label>
+              <input id="musicVolume" type="range" min="0" max="100" step="1" value="65" />
+              <strong id="musicVolumeValue">65%</strong>
+            </div>
+            <div class="desk-row volume-row">
+              <label for="sfxVolume" data-i18n="sfxVolume">Efeitos</label>
+              <input id="sfxVolume" type="range" min="0" max="100" step="1" value="70" />
+              <strong id="sfxVolumeValue">70%</strong>
+            </div>
+            <div class="desk-row">
+              <label for="pauseLanguageSelect" data-i18n="language">Idioma</label>
+              <select id="pauseLanguageSelect" aria-label="Idioma">
+                <option value="pt">PT</option>
+                <option value="en">EN</option>
+                <option value="es">ES</option>
+              </select>
+            </div>
+            <div class="desk-row">
+              <span data-i18n="autoSave">Salvamento automático</span>
+              <button class="small-button" id="autoSaveToggle" type="button">Ligado</button>
+            </div>
+            <section class="manual-save-panel">
+              <h3 data-i18n="manualSaves">Saves manuais</h3>
+              <div class="manual-save-list" id="pauseManualSaves"></div>
+            </section>
+            <button class="danger-button" id="pauseResetButton" type="button" data-i18n="resetSave">
+              Apagar save
+            </button>
+          </section>
+
+          <section class="pause-section">
+            <h3 data-i18n="controls">Controles</h3>
+            <ul class="credit-list">
+              <li data-i18n="controlAttack">Clique no botão central para bater/atacar.</li>
+              <li data-i18n="controlInventory">Use Inventário para reforçar upgrades com drops.</li>
+              <li data-i18n="controlRooms">Após derrotar inimigos, avance para a próxima sala.</li>
+            </ul>
+          </section>
+
+          <section class="pause-section">
+            <h3 data-i18n="credits">Créditos</h3>
+            <dl class="credit-list">
+              <dt data-i18n="creator">Criador</dt>
+              <dd>Teuz</dd>
+              <dt data-i18n="gameDesign">Design e programação</dt>
+              <dd>Teuz + Codex</dd>
+              <dt data-i18n="version">Versão</dt>
+              <dd>Protótipo 0.2</dd>
+            </dl>
+          </section>
+
+          <section class="pause-section">
+            <h3 data-i18n="assetCredits">Assets e licenças</h3>
+            <ul class="credit-list">
+              <li data-i18n="assetOriginalArt">Arte da porta: asset original gerado para este projeto.</li>
+              <li data-i18n="assetPixelFont">Fonte pixel: Press Start 2P, SIL Open Font License.</li>
+              <li data-i18n="assetExternalIncludedMusic">Música: Ancient caverns, congusbongus, CC0.</li>
+              <li data-i18n="assetExternalIncludedSprites">Sprites: Horror Fantasy Assets, stealthix, CC0.</li>
+              <li data-i18n="assetInternalAudio">Sons internos: áudio procedural via Web Audio API.</li>
+              <li data-i18n="assetInternalSprites">
+                Sprites dos inimigos: pixel art original gerado para este projeto.
+              </li>
+              <li data-i18n="assetOptionalExternal">
+                Assets externos opcionais devem ter licença comercial documentada.
+              </li>
+            </ul>
+          </section>
+
+          <section class="pause-section wide">
+            <h3 data-i18n="legalInfo">Informações obrigatórias</h3>
+            <ul class="credit-list">
+              <li data-i18n="legalSave">O jogo salva progresso localmente no navegador.</li>
+              <li data-i18n="legalNoTelemetry">Este protótipo não envia telemetria nem dados pessoais.</li>
+              <li data-i18n="legalSteam">
+                Antes da Steam, revisar licenças finais, créditos completos e página de privacidade.
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <div class="panic-flash" id="panicFlash" aria-hidden="true">
+      <span id="panicText">NÃO ABRA</span>
+    </div>
+
+    <script src="src/locales-fallback.js?v=0.5.1" defer></script>
+    <script src="src/game.js?v=0.5.1" defer></script>
+  </body>
+</html>
+<script defer src="https://static.itch.io/htmlgame.js" type="text/javascript"></script>
