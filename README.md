@@ -1,5 +1,7 @@
 # Batidas no Porão
 
+> Tema e direção de arte: veja [docs/TEMA.md](docs/TEMA.md).
+
 Protótipo de horror clicker em HTML5 (visual CRT, sprites autorais, português/inglês/espanhol).
 Jogue grátis em https://teuzin0dev.itch.io/batidas-no-porao
 
