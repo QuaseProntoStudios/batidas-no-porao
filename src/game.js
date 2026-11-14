@@ -1,7 +1,7 @@
 const SAVE_KEY = "batidas-no-porao-save-v2";
 const SETTINGS_KEY = "batidas-no-porao-settings-v1";
 const MANUAL_SAVE_PREFIX = "batidas-no-porao-manual-slot-";
-const GAME_VERSION = "0.5.1";
+const GAME_VERSION = "0.5.2";
 const FINAL_ROOM = 1000;
 const MERCHANT_INTERVAL = 15;
 const PRESTIGE_MIN_ROOM = 50;
@@ -1167,6 +1167,13 @@ function logLine(type, text) {
   const minutes = Math.floor(performance.now() / 60000);
   const seconds = Math.floor((performance.now() / 1000) % 60);
   const time = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  // Agrupa linhas idênticas e consecutivas ("Você causou 2 dano. x5") para o log não ficar poluído.
+  const last = state.log[0];
+  if (last && last.type === type && last.text === text) {
+    last.count = (last.count || 1) + 1;
+    last.time = time;
+    return;
+  }
   state.log.unshift({ type, text, time });
   state.log = state.log.slice(0, 90);
 }
@@ -1566,7 +1573,8 @@ function closeEvent() {
 function renderI18n() {
   document.documentElement.lang = state.lang === "pt" ? "pt-BR" : state.lang;
   document.querySelectorAll("[data-i18n]").forEach((node) => {
-    node.textContent = t(node.dataset.i18n);
+    const key = node.dataset.i18n;
+    node.textContent = key === "prototype" ? `${t(key)} ${GAME_VERSION}` : t(key);
   });
   document.title = t("gameTitle");
 }
@@ -1713,7 +1721,7 @@ function renderCombatMods() {
 
 function renderCombatLog() {
   const signature = `${state.lang}|${state.log
-    .map((line) => `${line.time}:${line.type}:${line.text}`)
+    .map((line) => `${line.time}:${line.type}:${line.text}:${line.count || 1}`)
     .join("|")}`;
   if (signature === lastCombatLogSignature) return;
   lastCombatLogSignature = signature;
@@ -1723,7 +1731,7 @@ function renderCombatLog() {
     return;
   }
   el.combatLog.replaceChildren(
-    ...state.log.slice(0, 42).map((line) => createLogItem(line.type, line.text, line.time)),
+    ...state.log.slice(0, 42).map((line) => createLogItem(line.type, line.text, line.time, line.count)),
   );
 }
 
@@ -1919,14 +1927,14 @@ function loadManualSlot(slot) {
   render();
 }
 
-function createLogItem(type, text, time) {
+function createLogItem(type, text, time, count = 1) {
   const item = document.createElement("li");
   const timeSpan = document.createElement("span");
   const textSpan = document.createElement("span");
   timeSpan.className = "time";
   textSpan.className = type;
   timeSpan.textContent = `(${time}) `;
-  textSpan.textContent = text;
+  textSpan.textContent = count > 1 ? `${text} x${count}` : text;
   item.append(timeSpan, textSpan);
   return item;
 }

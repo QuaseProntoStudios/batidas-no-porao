@@ -2,7 +2,7 @@ window.LOCALE_FALLBACK = {
   "pt": {
     "combatMode": "-- Em tensão --",
     "combatModeFight": "-- Em combate --",
-    "prototype": "Protótipo 0.2",
+    "prototype": "Protótipo",
     "gameTitle": "Batidas no Porão",
     "language": "Idioma",
     "nextRoom": "Entrar na próxima sala",
@@ -258,7 +258,7 @@ window.LOCALE_FALLBACK = {
   "en": {
     "combatMode": "-- Tension --",
     "combatModeFight": "-- Combat --",
-    "prototype": "Prototype 0.2",
+    "prototype": "Prototype",
     "gameTitle": "Knocks Below",
     "language": "Language",
     "nextRoom": "Enter next room",
@@ -514,7 +514,7 @@ window.LOCALE_FALLBACK = {
   "es": {
     "combatMode": "-- En tensión --",
     "combatModeFight": "-- En combate --",
-    "prototype": "Prototipo 0.2",
+    "prototype": "Prototipo",
     "gameTitle": "Golpes en el Sótano",
     "language": "Idioma",
     "nextRoom": "Entrar en la próxima sala",

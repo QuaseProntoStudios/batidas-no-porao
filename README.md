@@ -5,7 +5,7 @@ Jogue grátis em https://teuzin0dev.itch.io/batidas-no-porao
 
 ## Origem deste repositório
 O projeto original não estava mais disponível. Este código foi recuperado da build
-publicada no itch.io (v0.5.1). Os arquivos são os mesmos que o navegador carrega,
+publicada no itch.io (v0.5.1) e evoluído em seguida. Os arquivos são os mesmos que o navegador carrega,
 sem minificação.
 
 ## Rodando localmente
@@ -21,8 +21,10 @@ Abra http://localhost:8000
 - `assets/`: fonte, sprites e música
 
 ## Pendências conhecidas
-- Os efeitos sonoros `assets/audio/sfx/*.mp3` não existem na build publicada;
-  o jogo usa sons sintetizados no lugar.
+- Os efeitos sonoros em `assets/audio/sfx/` são sintéticos (gerados por script)
+  e podem ser trocados por gravações melhores com o mesmo nome de arquivo.
+- Teste de redesenho dos sprites com Meshy (rato): ficou escuro e destoou do estilo
+  chapado atual, então os sprites originais foram mantidos.
 - Confirmar a licença do pack `assets/sprites/packs/horror-fantasy-assets.png`
   antes de tornar o repositório público.
 
